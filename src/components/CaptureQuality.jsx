@@ -23,6 +23,16 @@ import {
   summarizeVideo
 } from '../utils/debug';
 
+function summarizeCvModuleShape(cvModule) {
+  return {
+    type: typeof cvModule,
+    isFunction: typeof cvModule === 'function',
+    hasMat: !!cvModule?.Mat,
+    hasThen: typeof cvModule?.then === 'function',
+    constructorName: cvModule?.constructor?.name || null
+  };
+}
+
 export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }) {
   const [cv, setCv] = useState(null);
   const [cvLoading, setCvLoading] = useState(true);
@@ -57,8 +67,26 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
     setCvLoading(true);
 
     try {
+      debugLog('loader-ui', 'retry awaiting OpenCV handoff', {
+        sessionId: getDebugSessionId(),
+        cvLoadId
+      });
       const cvModule = await loadOpenCV();
-      setCv(cvModule);
+      debugLog('loader-ui', 'retry received OpenCV module', {
+        sessionId: getDebugSessionId(),
+        cvLoadId,
+        cvModule: summarizeCvModuleShape(cvModule)
+      });
+      debugLog('loader-ui', 'retry before setCv', {
+        sessionId: getDebugSessionId(),
+        cvLoadId,
+        cvModule: summarizeCvModuleShape(cvModule)
+      });
+      setCv(() => cvModule);
+      debugLog('loader-ui', 'retry after setCv', {
+        sessionId: getDebugSessionId(),
+        cvLoadId
+      });
       debugLog('loader-ui', 'retry resolved', {
         sessionId: getDebugSessionId(),
         cvLoadId,
@@ -72,7 +100,15 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
       });
       setCvError(err?.message || 'Failed to load local OpenCV assets');
     } finally {
+      debugLog('loader-ui', 'retry before setCvLoading false', {
+        sessionId: getDebugSessionId(),
+        cvLoadId
+      });
       setCvLoading(false);
+      debugLog('loader-ui', 'retry after setCvLoading false', {
+        sessionId: getDebugSessionId(),
+        cvLoadId
+      });
       debugLog('loader-ui', 'retry finished', {
         sessionId: getDebugSessionId(),
         cvLoadId,
@@ -100,9 +136,31 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
       });
 
       try {
+        debugLog('loader-ui', 'mount awaiting OpenCV handoff', {
+          sessionId: getDebugSessionId(),
+          cvLoadId,
+          isMounted
+        });
         const cvModule = await loadOpenCV();
+        debugLog('loader-ui', 'mount received OpenCV module', {
+          sessionId: getDebugSessionId(),
+          cvLoadId,
+          isMounted,
+          cvModule: summarizeCvModuleShape(cvModule)
+        });
         if (isMounted) {
-          setCv(cvModule);
+          debugLog('loader-ui', 'mount before setCv', {
+            sessionId: getDebugSessionId(),
+            cvLoadId,
+            isMounted,
+            cvModule: summarizeCvModuleShape(cvModule)
+          });
+          setCv(() => cvModule);
+          debugLog('loader-ui', 'mount after setCv', {
+            sessionId: getDebugSessionId(),
+            cvLoadId,
+            isMounted
+          });
         }
         debugLog('loader-ui', 'mount load resolved', {
           sessionId: getDebugSessionId(),
@@ -122,7 +180,17 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
         }
       } finally {
         if (isMounted) {
+          debugLog('loader-ui', 'mount before setCvLoading false', {
+            sessionId: getDebugSessionId(),
+            cvLoadId,
+            isMounted
+          });
           setCvLoading(false);
+          debugLog('loader-ui', 'mount after setCvLoading false', {
+            sessionId: getDebugSessionId(),
+            cvLoadId,
+            isMounted
+          });
         }
         debugLog('loader-ui', 'mount load finished', {
           sessionId: getDebugSessionId(),
@@ -364,10 +432,22 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
   }, [queue.queue, onImageAccepted, onImageRejected]);
 
   if (cvLoading) {
+    debugLog('capture-quality', 'render branch loading', {
+      sessionId: getDebugSessionId(),
+      cvLoading,
+      hasCv: !!cv,
+      cvError
+    });
     return <div className="loading">Loading local OpenCV assets...</div>;
   }
 
   if (cvError) {
+    debugLog('capture-quality', 'render branch error', {
+      sessionId: getDebugSessionId(),
+      cvLoading,
+      hasCv: !!cv,
+      cvError
+    });
     return (
       <div className="opencv-error">
         <h3>Failed to load OpenCV</h3>
@@ -379,8 +459,24 @@ export function CaptureQuality({ config = {}, onImageAccepted, onImageRejected }
   }
 
   if (!cv) {
+    debugLog('capture-quality', 'render branch no-cv', {
+      sessionId: getDebugSessionId(),
+      cvLoading,
+      hasCv: !!cv,
+      cvError
+    });
     return <div className="opencv-error">OpenCV not available</div>;
   }
+
+  debugLog('capture-quality', 'render branch main-app', {
+    sessionId: getDebugSessionId(),
+    cvLoading,
+    hasCv: !!cv,
+    cvError,
+    cameraActive: camera.isActive,
+    queueLength: queue.queue.length,
+    showResult
+  });
 
   return (
     <div className="capture-quality">
