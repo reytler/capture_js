@@ -1,0 +1,13 @@
+:root {
+  --primary-color: #007bff;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #dee2e6;
+  --overlay-color: rgba(0, 0, 0, 0.5);
+  --camera-bg: #000000;
+  --queue-bg: #f8f9fa;
+  --result-bg: #ffffff;
+}

@@ -1,0 +1,13 @@
+# App flow
+- O app deve ser um componente reutilizável React(Vite)
+- O app deve usar o OpenCV
+- Deve ser um projeto a parte que eu possa usar como serviço
+- Deve ser um componente com cores customizáveis
+- Deve usar CSS puro
+- Deve ser responsivo
+- Deve solicitar o acesso a câmera
+- Faça de uma forma que eu possa rodar uma demo para testar em meu celular pelo navegador
+- Deve permitir escolher a camera frontal ou traseira, sendo a traseira como default
+- Deve salvar as imagens em uma fila em memória e mostrar o percentual de processamento de cada imagem com uma boa UI/UX
+- Deve permitir continuar tirando fotos enquanto as fotos da fila são processadas
+- Deve ter um guia ao vivo para identificar os cantos do documento e ajustar o enquadramento automático.
